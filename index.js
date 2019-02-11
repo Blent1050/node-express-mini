@@ -53,7 +53,18 @@ server.post("/api/users", (req, res) => {
 server.put("/api/users/:id", (req, res) => {});
 
 //DELETE
-server.delete("/api/users/:id", (req, res) => {});
+server.delete("/api/users/:id", (req, res) => {
+    const userId = req.params.id;
+    db.remove(userId)
+    .then(deleted => {
+        if(!deleted)
+            return res.status(404).json({message: "The user with the specified ID does not exist."})
+        res.status(204).end();
+    })
+    .catch(err => {
+        res.status(500).json({ error: "The user could not be removed" });
+    })
+});
 
 server.listen(PORT, () => {
   console.log(`Server is listening on Port ${PORT}`);
