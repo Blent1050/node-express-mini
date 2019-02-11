@@ -38,19 +38,35 @@ server.post("/api/users", (req, res) => {
   const user = req.body;
   //Check if name and bio keys are attached to request. If not, return error code.
   if(!user.name || !user.bio)
-    return res.status(400).json({errorMessage: "Please provide name and bio for the user."})
+    return res.status(400).json({error: "Please provide name and bio for the user."})
 
   db.insert(user)
     .then(user => {  
         res.status(201).json({ success: true, user: user });
     })
     .catch(() => {
-      res.status(500).json({ errorMessage: 'Please provide name and bio for the user.' });
+      res.status(500).json({ error: 'Please provide name and bio for the user.' });
     });
 });
 
 //PUT
-server.put("/api/users/:id", (req, res) => {});
+server.put("/api/users/:id", (req, res) => {
+    const id = req.params.id;
+    const user = req.body;
+
+    db.update(id, user)
+    .then(updatedUser => {
+        if(!updatedUser)
+             return res.status(404).json({success: false, message: 'The user with the specified ID cannot be found.'})
+        else if(!user.name || !user.bio)
+            return res.status(400).json({success: false, message: 'A user requires a name and bio in order to be updated.'})
+        else
+            res.status(200).json({success: true, user})
+    })
+    .catch(err => {
+        res.status(500).json({ error: "The user information could not be modified." });
+    })
+});
 
 //DELETE
 server.delete("/api/users/:id", (req, res) => {
