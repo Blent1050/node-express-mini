@@ -24,7 +24,9 @@ server.get("/api/users/:id", (req, res) => {
   const userId = req.params.id;
   db.findById(userId)
     .then(user => {
-      res.status(200).json(user);
+        if(!user)
+            return res.status(404).json({message: "The user with the specified ID does not exist."})
+        res.status(200).json(user);
     })
     .catch(err => {
       res.status(500).json({ success: false, error: "The user's information could not be retrieved." });
