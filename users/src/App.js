@@ -10,7 +10,11 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      users: []
+      users: [],
+      newUser: {
+        name: '',
+        bio: ''
+      }
     }
   }
 
@@ -28,29 +32,59 @@ class App extends Component {
     })
   }
 
-  addUser = (user) => {
-    axios.post(`${baseUrl}/users`, user)
-    .then(res => this.setState({users: res.data}))
+  addUser = (e) => {
+    e.preventDefault();
+    axios.post(`${baseUrl}/users`, this.state.newUser)
+    .then(res => {
+      this.getUsers();
+    })
     .catch(err => console.log(err))
   }
 
-  updateUser = () => {
+  updateUser = (e, itemId) => {
+    e.preventDefault();
+    axios
+    .put(`${baseUrl}/users/${itemId}`, this.state.newUser)
+    .then(res => {
+      this.getUsers();
+    })
+    .catch(err => console.log(err))
+    
 
   }
 
-  deleteUser = () => {
+  deleteUser = (e, itemId) => {
+    e.preventDefault();
+    axios
+    .delete(`${baseUrl}/users/${itemId}`)
+    .then(res => {
+      this.getUsers();
+    })
+    .catch(err => console.log(err))
+  }
 
+  handleChanges = (e) => {
+    e.persist();
+    this.setState(prevState => {
+      return{
+        newUser: {
+          ...prevState.newUser,
+          [e.target.name]: e.target.value
+        }
+      }
+    })
+    console.log(this.state)
   }
 
   render() {
     console.log(this.state.users)
     return (
       <div className="App">
-        <UserForm addUser={this.addUser}/>
+        <UserForm handleChanges={this.handleChanges} addUser={this.addUser}/>
         <br/>
         {
           this.state.users.map(user => {
-            return <UserCard />
+            return <UserCard updateUser={this.updateUser} deleteUser={this.deleteUser} user={user}/>
           })
         }
         

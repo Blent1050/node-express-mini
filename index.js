@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 
 const db = require("./data/db.js");
 const server = express();
@@ -6,7 +7,7 @@ const PORT = 4000;
 
 //Middleware
 server.use(express.json());
-
+server.use(cors());
 // ---- ROUTES ---- //
 
 //GET
@@ -75,7 +76,7 @@ server.delete("/api/users/:id", (req, res) => {
     .then(deleted => {
         if(!deleted)
             return res.status(404).json({message: "The user with the specified ID does not exist."})
-        res.status(204).end();
+        res.status(204).end()
     })
     .catch(err => {
         res.status(500).json({ error: "The user could not be removed" });
